@@ -1,0 +1,318 @@
+---
+output:
+  pdf_document: default
+  html_document: default
+---
+##R Markdown
+
+---
+title: "DADA2_WWC"
+author: "Erin Eggleston
+date: "9/7/2023"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+install.packages("knitr")
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## DADA2 pipeline with Winter Wonderland Ice cave samples
+
+
+First load DADA2 package - instructions on installation from: https://benjjneb.github.io/dada2/dada-installation.html
+
+#base R version 4.4.2
+```{r}
+if (!requireNamespace("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+BiocManager::install("dada2")
+
+library(dada2)
+packageVersion("dada2") #Version 1.20.0
+```
+
+According to the DADA2 tutorial, the data must follow the following criteria:
+
+1. Samples have been demultiplexed, i.e. split into individual per-sample fastq files.
+2. Non-biological nucleotides have been removed, e.g. primers, adapters, linkers, etc.
+3. If paired-end sequencing data, the forward and reverse fastq files contain reads in matched order.
+
+Our samples are Illumina MiSeq 2x250 reads of the V3-V4 region of the 16S rRNA gene which is different than the tutorial.
+
+```{r}
+path <- "/Users/eeggleston/OneDrive - Middlebury College/WWC_R"  
+setwd ("/Users/eeggleston/OneDrive - Middlebury College/WWC_R")
+getwd()
+
+list.files(path) #verify you have all the files and they are in the correct format
+
+#read in names of fastq.gz files
+fnFs <- sort(list.files(path, pattern = "_R1.fastq", full.names = TRUE))
+fnFs
+
+fnRs <- sort(list.files(path, pattern = "_R2.fastq", full.names = TRUE))
+#extract sample names (may need to be changed depending on filename format). Mine output as "Sample-#"
+sample.names <- sapply(strsplit(basename(fnFs), "_R"), `[`, 1)
+sample.names #check the names
+
+```
+
+#####First thing to do is inspect the read quality profiles
+```{r}
+plotQualityProfile(fnFs[1:4]) #general samples forward reads
+plotQualityProfile(fnRs[1:4]) #general samples reverse reads
+
+plotQualityProfile(fnFs[16]) #negative control forward reads (sample 24)
+plotQualityProfile(fnRs[16]) #negative control reverse reads
+
+plotQualityProfile(fnFs[15]) #positive control forward reads (sample 23)
+plotQualityProfile(fnRs[15]) #positive control reverse reads
+
+```
+Sequence quality observations: for the general samples the read quality is pretty high. The positive control (ZymoBIOMICS Microbial Community Standard) has high quality, but the negative control (DNA extraction of nfH20) has very few reads and has poor sequence quality. This is expected for the negative control. The reverse reads all drop off in quality closer to 200 cycles, unlike the forward reads which have high quality until ~280 nt. 
+
+We will not proceed with the reverse reads since the quality scores drop enough such that we would expect no overlap between forward and reverse reads after trimming.(Amplicon size with barcoded primers ~596bp). 
+
+Forward reads will be trimmed for Quick-16S primer set v3-v4 from ZYMO trimLeft = 16. Reverse primer is 24 nt, not needed since we won't use the reverse reads. Additionally, 20nt will be trimmed from the end of the forward reads due to lower quality.
+
+##Filter and trim files
+Put all the files in a /filtered/ subdirectory
+`maxN=` is the number of Ns (dada2 requires none)
+`maxEE=` is the number of expected error allowed in a read. I chose 2, which is how many the tutorial selected.
+
+```{r}
+filtFs <- file.path(path, "filtered2", paste0(sample.names, "_F_filt.fastq.gz"))
+names(filtFs) <- sample.names
+outF<- filterAndTrim(fnFs, filtFs, trimLeft = 16, truncLen = 280, maxN = 0, maxEE = 2, truncQ=2, rm.phix = TRUE, compress = TRUE, multithread = TRUE) #trimleft is 16 because that is how long the forward primer is. #trunLen is 145 because I want to cut off the last 20 nt of the 300 nt read. 
+outF
+plotQualityProfile(filtFs[1:4]) #check quality after trim of a few forward read samples
+```
+Results when the maximum number of expected errors was 2. In general, about 1,000-2,000 sequence reads were lost in each sample. Samples 5 and 15 have relatively low reads (E6 -CCC and W5 -water from skating rink, respectively) which is notable, the only other low read sample is the negative control. I still have quite a lot of sequence reads. Fairly consistent for numbers of reads trimmed across samples, no samples lost significant amounts of sequences.
+
+Creating output directory: C:/Users/eeggleston/OneDrive - Middlebury College/WWC_R/filtered2
+              reads.in reads.out
+zr3100_10V3V4_R1.fastq    12118     11624
+zr3100_11V3V4_R1.fastq    21300     20418
+zr3100_12V3V4_R1.fastq     4596      4286
+zr3100_13V3V4_R1.fastq    25304     24460
+zr3100_14V3V4_R1.fastq    30546     29713
+zr3100_15V3V4_R1.fastq     4853      4458
+zr3100_16V3V4_R1.fastq    23051     22326
+zr3100_17V3V4_R1.fastq    23863     22868
+zr3100_18V3V4_R1.fastq    13335     12700
+zr3100_19V3V4_R1.fastq    31253     29975
+zr3100_1V3V4_R1.fastq     21005     20047
+zr3100_20V3V4_R1.fastq   106869    103074
+zr3100_21V3V4_R1.fastq    91378     87384
+zr3100_22V3V4_R1.fastq    41228     40240
+zr3100_23V3V4_R1.fastq    33002     32035
+zr3100_24V3V4_R1.fastq       91        66
+zr3100_2V3V4_R1.fastq     22385     21629
+zr3100_3V3V4_R1.fastq     12055     11557
+zr3100_4V3V4_R1.fastq     17343     16703
+zr3100_5V3V4_R1.fastq      2263      2082
+zr3100_6V3V4_R1.fastq     13487     12907
+zr3100_7V3V4_R1.fastq     13241     12537
+zr3100_8V3V4_R1.fastq     13678     13205
+zr3100_9V3V4_R1.fastq     18121     17202
+
+Notes on forward read trim quality:trimmed reads look good, high quality, effective trimming
+##Learn the error rates
+```{r}
+errF <- learnErrors(filtFs, multithread = TRUE)
+```
+This step took some time (~15 min) on my Mac desktop
+
+103839912 total bases in 393333 reads from 13 samples will be used for learning the error rates.
+##Plot Error Rates
+```{r}
+plotErrors(errF, nominalQ = TRUE)
+```
+These error plots all look pretty good. There seem to be a few outliers at low Q scores, but as the Q30 score goes up, the error frequency decreases. 
+
+
+##Dereplication and Sample Inference - The main dada2 step of making OTUs
+
+```{r}
+derepF <- derepFastq(filtFs, verbose=TRUE)
+names(derepF) <- sample.names
+
+
+dadaFs <- dada(derepF, err=errF, multithread=TRUE)
+dadaFs[[10]]
+```
+
+Sample 1 - 11624 reads in 4287 unique sequences.
+Sample 2 - 20418 reads in 7904 unique sequences.
+Sample 3 - 4286 reads in 1649 unique sequences.
+Sample 4 - 24460 reads in 4131 unique sequences.
+Sample 5 - 29713 reads in 8291 unique sequences.
+Sample 6 - 4458 reads in 1763 unique sequences.
+Sample 7 - 22326 reads in 6373 unique sequences.
+Sample 8 - 22868 reads in 7179 unique sequences.
+Sample 9 - 12700 reads in 4300 unique sequences.
+Sample 10 - 29975 reads in 10138 unique sequences.
+Sample 11 - 20047 reads in 8562 unique sequences.
+Sample 12 - 103074 reads in 47360 unique sequences.
+Sample 13 - 87384 reads in 33624 unique sequences.
+Sample 14 - 40240 reads in 11374 unique sequences.
+Sample 15 - 32035 reads in 6995 unique sequences.
+Sample 16 - 66 reads in 64 unique sequences.
+Sample 17 - 21629 reads in 10421 unique sequences.
+Sample 18 - 11557 reads in 4837 unique sequences.
+Sample 19 - 16703 reads in 9451 unique sequences.
+Sample 20 - 2082 reads in 909 unique sequences.
+Sample 21 - 12907 reads in 7640 unique sequences.
+Sample 22 - 12537 reads in 7590 unique sequences.
+Sample 23 - 13205 reads in 7218 unique sequences.
+Sample 24 - 17202 reads in 8661 unique sequences.
+
+dada-class: object describing DADA2 denoising results
+349 sequence variants were inferred from 10138 input unique sequences.
+Key parameters: OMEGA_A = 1e-40, OMEGA_C = 1e-40, BAND_SIZE = 16
+
+####Construct ASV table
+We can now construct an amplicon sequence variant table (ASV) table, a higher-resolution version of the OTU table produced by traditional methods.
+```{r}
+seqtabF <- makeSequenceTable(dadaFs)
+dim(seqtabF) #should have 24 samples - looks like we have 6253 different ASVs
+```
+
+Notes: Based on the output, I have 6253 unique sequences.
+
+```{r}
+# Inspect distribution of sequence lengths
+table(nchar(getSequences(seqtabF)))
+```
+
+##Remove chimeras 
+```{r}
+seqtab.nochimF <- removeBimeraDenovo(seqtabF, method="consensus", multithread=TRUE, verbose=TRUE)
+dim(seqtab.nochimF)
+
+# Identified 998 bimeras out of 6253 input sequences.
+```
+
+
+```{r}
+sum(seqtab.nochimF)/sum(seqtabF)
+```
+
+Looks like about 92% of ASVs were chimeric
+
+##Track reads through the pipeline
+```{r}
+getNF <- function(x) sum(getUniques(x))
+trackF <- cbind(outF, sapply(dadaFs, getNF), rowSums(seqtab.nochimF))
+# If processing a single sample, remove the sapply calls: e.g. replace sapply(dadaFs, getN) with getN(dadaFs)
+colnames(trackF) <- c("input", "filtered", "denoisedF", "nonchim")
+rownames(trackF) <- sample.names
+trackF
+```
+
+               input filtered denoisedF nonchim
+zr3100_10V3V4  12118    11624     11162   11113
+zr3100_11V3V4  21300    20418     19454   19112
+zr3100_12V3V4   4596     4286      3919    3909
+zr3100_13V3V4  25304    24460     24212   24024
+zr3100_14V3V4  30546    29713     29129   25255
+zr3100_15V3V4   4853     4458      4248    4248
+zr3100_16V3V4  23051    22326     21743   21606
+zr3100_17V3V4  23863    22868     22320   21392
+zr3100_18V3V4  13335    12700     12256   12078
+zr3100_19V3V4  31253    29975     29298   21355
+zr3100_1V3V4   21005    20047     18707   18395
+zr3100_20V3V4 106869   103074     92948   89139
+zr3100_21V3V4  91378    87384     83262   70126
+zr3100_22V3V4  41228    40240     39281   34042
+zr3100_23V3V4  33002    32035     31852   26242
+zr3100_24V3V4     91       66         7       7
+zr3100_2V3V4   22385    21629     19399   18037
+zr3100_3V3V4   12055    11557     11002   10958
+zr3100_4V3V4   17343    16703     14216   13882
+zr3100_5V3V4    2263     2082      1962    1962
+zr3100_6V3V4   13487    12907     10607   10483
+zr3100_7V3V4   13241    12537     10200   10171
+zr3100_8V3V4   13678    13205     11302   11137
+zr3100_9V3V4   18121    17202     15472   15198
+
+
+#assign taxa with DECIPHER
+
+```{r}
+if (!requireNamespace("BiocManager", quietly=TRUE))
+  install.packages("BiocManager")
+BiocManager::install("DECIPHER")
+
+library(DECIPHER); packageVersion("DECIPHER") #Version 2.20.0
+ 
+dnaF <- DNAStringSet(getSequences(seqtab.nochimF)) # Create a DNAStringSet from the ASVs
+load("/Users/eeggleston/OneDrive - Middlebury College/WWC_R/SILVA_SSU_r138_2019.RData") # CHANGE TO THE PATH OF YOUR TRAINING SET
+idsF <- IdTaxa(dnaF, trainingSet, strand="top", processors=NULL, verbose=FALSE) # use all processors
+ranks <- c("domain", "phylum", "class", "order", "family", "genus", "species") # ranks of interest
+#the ID assignments took a long run time on a desktop Mac (overnight) to complete assignment
+
+# Convert the output object of class "Taxa" to a matrix analogous to the output from assignTaxonomy
+taxidF <- t(sapply(idsF, function(x) {
+  m <- match(ranks, x$rank)
+  taxa <- x$taxon[m]
+  taxa[startsWith(taxa, "unclassified_")] <- NA
+  taxa
+}))
+colnames(taxidF) <- ranks; rownames(taxidF) <- getSequences(seqtab.nochimF)
+```
+
+Look at some taxonomic assignments...
+```{r}
+taxa.printF <- taxidF
+rownames(taxa.printF) <- NULL
+head(taxa.printF)
+```
+
+#make and save a summary table and saving ASV,count, and tax tables
+```{r}
+summary_tabF <- data.frame(row.names = sample.names, dada2_input= outF[,1],
+                          filtered= outF[,2], dada_f=sapply(dadaFs,getNF),
+                          nonchim=rowSums(seqtab.nochimF), 
+                          final_percent_reads_retained = round(rowSums(seqtab.nochimF)/outF[,1]*100, 1))
+summary_tabF
+write.table(summary_tabF, "read-count-trackingF.csv", quote = FALSE, sep = ",", col.names = NA)
+```
+
+#standard dada2 output
+
+```{r}
+# giving our seq headers more manageable names (ASV_1, ASV_2...)
+asv_seqsF <-colnames(seqtab.nochimF)
+asv_headersF <-vector(dim(seqtab.nochimF)[2],mode = "character")
+
+for (i in 1:dim(seqtab.nochimF)[2]){
+  asv_headersF[i] <- paste(">ASV",i,sep = "_")
+}
+
+#make and write out fasta of our final ASV seqs
+
+asv_fastaF<- c(rbind(asv_headersF, asv_seqsF))
+write(asv_fastaF, "ASVsF.fa")
+
+#count table
+asv_tabF <- t(seqtab.nochimF)
+row.names(asv_tabF) <- sub(">","", asv_headersF)
+write.table(asv_tabF, "ASVs_countsF.csv", sep = ",", quote= FALSE, col.names = NA)
+
+# tax table:
+  # creating table of taxonomy and setting any that are unclassified as "NA"
+asv_taxF <- t(sapply(idsF, function(x) {
+  m <- match(ranks, x$rank)
+  taxa <- x$taxon[m]
+  taxa[startsWith(taxa, "unclassified_")] <- NA
+  taxa
+}))
+colnames(asv_taxF) <- ranks
+rownames(asv_taxF) <- gsub(pattern=">", replacement="", x=asv_headersF)
+
+write.table(asv_taxF, "ASVsF_taxonomy.csv", sep = ",", quote=F, col.names=NA)
+
+```
+
