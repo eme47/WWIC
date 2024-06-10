@@ -1,0 +1,25 @@
+﻿sample.name,name,type,site,description,zymo_name,quant_reading,is.neg,is.pos,Sample_or_control
+zr3100_1V3V4,E1,CCC,WWC,"Skating Rink, right","zr3100_1V3V4	E1	zr3100_1V3V4_R1.fastq.gz;zr3100_1V3V4_R2.fastq.gz	",4.19,FALSE,FALSE,Sample
+zr3100_2V3V4,E2,CCC,WWC,"Skating Rink, right","zr3100_2V3V4	E2	zr3100_2V3V4_R1.fastq.gz;zr3100_2V3V4_R2.fastq.gz	",8.71,FALSE,FALSE,Sample
+zr3100_3V3V4,E3,CCC,WWC,"Skating Rink, right","zr3100_3V3V4	E3	zr3100_3V3V4_R1.fastq.gz;zr3100_3V3V4_R2.fastq.gz	",2.72,FALSE,FALSE,Sample
+zr3100_4V3V4,E5,CCC,WWC,"Skating Rink, right","zr3100_4V3V4	E5	zr3100_4V3V4_R1.fastq.gz;zr3100_4V3V4_R2.fastq.gz	",6.7,FALSE,FALSE,Sample
+zr3100_5V3V4,E6,CCC,WWC,"Skating Rink, right","zr3100_5V3V4	E6	zr3100_5V3V4_R1.fastq.gz;zr3100_5V3V4_R2.fastq.gz	",2.13,FALSE,FALSE,Sample
+zr3100_6V3V4,E7,CCC,WWC,"Skating Rink, left","zr3100_6V3V4	E7	zr3100_6V3V4_R1.fastq.gz;zr3100_6V3V4_R2.fastq.gz	",7.89,FALSE,FALSE,Sample
+zr3100_7V3V4,E8,CCC,WWC,"Skating Rink, left","zr3100_7V3V4	E8	zr3100_7V3V4_R1.fastq.gz;zr3100_7V3V4_R2.fastq.gz	",7.85,FALSE,FALSE,Sample
+zr3100_8V3V4,E9,CCC,WWC,"Skating Rink, left","zr3100_8V3V4	E9	zr3100_8V3V4_R1.fastq.gz;zr3100_8V3V4_R2.fastq.gz	",6.93,FALSE,FALSE,Sample
+zr3100_9V3V4,E10,CCC,WWC,Frozen Freeway left,"zr3100_9V3V4	E10	zr3100_9V3V4_R1.fastq.gz;zr3100_9V3V4_R2.fastq.gz	",5.14,FALSE,FALSE,Sample
+zr3100_10V3V4,E12,CCC,WWC,"Frozen Freeway ,right","zr3100_10V3V4	E12	zr3100_10V3V4_R1.fastq.gz;zr3100_10V3V4_R2.fastq.gz	",1.69,FALSE,FALSE,Sample
+zr3100_11V3V4,E13,CCC,WWC,"Frozen Freeway, left, top of small speleothem","zr3100_11V3V4	E13	zr3100_11V3V4_R1.fastq.gz;zr3100_11V3V4_R2.fastq.gz	",3.24,FALSE,FALSE,Sample
+zr3100_12V3V4,E16,Biofilm,whiterocks,na,"zr3100_12V3V4	E16	zr3100_12V3V4_R1.fastq.gz;zr3100_12V3V4_R2.fastq.gz	",0.99,FALSE,FALSE,Sample
+zr3100_13V3V4,W2,Water,WWC,Skating Rink,"zr3100_13V3V4	W2	zr3100_13V3V4_R1.fastq.gz;zr3100_13V3V4_R2.fastq.gz	",2.07,FALSE,FALSE,Sample
+zr3100_14V3V4,W3,Water,WWC,Skating Rink,"zr3100_14V3V4	W3	zr3100_14V3V4_R1.fastq.gz;zr3100_14V3V4_R2.fastq.gz	",4.02,FALSE,FALSE,Sample
+zr3100_15V3V4,W5,Water,WWC,Skating Rink,"zr3100_15V3V4	W5	zr3100_15V3V4_R1.fastq.gz;zr3100_15V3V4_R2.fastq.gz	",1.34,FALSE,FALSE,Sample
+zr3100_16V3V4,W7,Water,whiterocks,na,"zr3100_16V3V4	W7	zr3100_16V3V4_R1.fastq.gz;zr3100_16V3V4_R2.fastq.gz	",2.26,FALSE,FALSE,Sample
+zr3100_17V3V4,W8,Water,whiterocks,na,"zr3100_17V3V4	W8	zr3100_17V3V4_R1.fastq.gz;zr3100_17V3V4_R2.fastq.gz	",3.5,FALSE,FALSE,Sample
+zr3100_18V3V4,I1,Ice,WWC,ice block,"zr3100_18V3V4	I1	zr3100_18V3V4_R1.fastq.gz;zr3100_18V3V4_R2.fastq.gz	",1.77,FALSE,FALSE,Sample
+zr3100_19V3V4,I2,Ice,WWC,fragments from cutting at Thayer,"zr3100_19V3V4	I2	zr3100_19V3V4_R1.fastq.gz;zr3100_19V3V4_R2.fastq.gz	",5.75,FALSE,FALSE,Sample
+zr3100_20V3V4,I3,Ice,WWC,fragments from transport to VT,"zr3100_20V3V4	I3	zr3100_20V3V4_R1.fastq.gz;zr3100_20V3V4_R2.fastq.gz	",5.28,FALSE,FALSE,Sample
+zr3100_21V3V4,B1,Background,WWC,"Skating Rink, back corner floor ground water, by ice block","zr3100_21V3V4	B1	zr3100_21V3V4_R1.fastq.gz;zr3100_21V3V4_R2.fastq.gz	",6.72,FALSE,FALSE,Sample
+zr3100_22V3V4,B2,Background,WWC,"Skating Rink, ground water, dirty","zr3100_22V3V4	B2	zr3100_22V3V4_R1.fastq.gz;zr3100_22V3V4_R2.fastq.gz	",5.58,FALSE,FALSE,Sample
+zr3100_23V3V4,Positive,kit.positive,kit,na,"zr3100_23V3V4	Positive	zr3100_23V3V4_R1.fastq.gz;zr3100_23V3V4_R2.fastq.gz	",5,FALSE,TRUE,Control_pos
+zr3100_24V3V4,Negative,kit.negative,kit,na,"zr3100_24V3V4	Negative	zr3100_24V3V4_R1.fastq.gz;zr3100_24V3V4_R2.fastq.gz	",0.63,TRUE,FALSE,Control_neg
